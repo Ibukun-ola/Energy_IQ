@@ -358,13 +358,11 @@ if predict_btn:
     diesel_cost_ngn = round(diesel_litres * 1200, 2)
 
     # Monthly
-    if is_weekend == 0:
-        monthly_kwh = round((total_demand_kwh * 22) + (total_demand_kwh * 0.4 * 8), 2)
-        monthly_diesel_cost = round(diesel_cost_ngn * 22, 2)
-    else:
-        monthly_kwh = round(total_demand_kwh * 30, 2)
-        monthly_diesel_cost = round(diesel_cost_ngn * 30, 2)
-
+    weekday_kwh = total_demand_kwh
+    weekend_kwh = total_demand_kwh * 0.4
+    monthly_kwh = round((weekday_kwh * 22) + (weekend_kwh * 8), 2)
+    monthly_diesel_cost = round(diesel_cost_ngn * 22, 2)
+       
     season = "Dry Season (Harmattan)" if nigerian_dry_season else "Rainy Season"
 
     # ─── Results Layout ──────────────────────────────────────────────────────
