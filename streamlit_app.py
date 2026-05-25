@@ -338,29 +338,45 @@ if predict_btn:
     log_pred = model.predict(features)[0]
     total_demand_kwh = float(np.expm1(log_pred))
 
- # Generator hours
+# ─── Weekday prediction for monthly calculation ──────────────────────────────────────────────────────────
+features_weekday = np.array([[
+    hour, month, 0, 1, nigerian_dry_season,
+    square_feet, floor_count, building_age, primary_use_encoded,
+    air_temperature, wind_speed, sea_level_pressure
+]])
+demand_weekday = float(np.expm1(model.predict(features_weekday)[0]))
+
+# ─── Weekend prediction for monthly calculation ──────────────────────────────────────────────────────────
+features_weekend = np.array([[
+    hour, month, 1, 0, nigerian_dry_season,
+    square_feet, floor_count, building_age, primary_use_encoded,
+    air_temperature, wind_speed, sea_level_pressure
+]])
+demand_weekend = float(np.expm1(model.predict(features_weekend)[0]))
+
+    # ─── Generator hours ──────────────────────────────────────────────────────────
     operating_hrs = OPERATING_HOURS.get(building_type, 8)
 
-    # Grid supply (adjusted for overlap efficiency)
+    # ─── Grid supply (adjusted for overlap efficiency) ──────────────────────────────────────────────────────────
     overlap_efficiency = ZONES[zone]['overlap']
     effective_grid_hours = grid_hours * overlap_efficiency
     grid_supply_kwh = total_demand_kwh * (min(effective_grid_hours, operating_hrs) / operating_hrs)
     diesel_demand_kwh = max(0, total_demand_kwh - grid_supply_kwh)
     grid_coverage_pct = (grid_supply_kwh / total_demand_kwh * 100) if total_demand_kwh > 0 else 0
 
- # Deficit hours
+    # ─── Deficit hours ──────────────────────────────────────────────────────────
     deficit = max(0, operating_hrs - effective_grid_hours)
     generator_hours = min(operating_hrs, deficit + 1.0)
 
-    # Diesel cost
+    # ─── Diesel cost ──────────────────────────────────────────────────────────
     litres_per_hour = max(0.5, square_feet * 0.0015)
     diesel_litres = round(generator_hours * litres_per_hour, 2)
     diesel_cost_ngn = round(diesel_litres * 1200, 2)
 
-    # Monthly
+    # ─── Monthly ──────────────────────────────────────────────────────────
     weekday_kwh = total_demand_kwh
     weekend_kwh = total_demand_kwh * 0.4
-    monthly_kwh = round((weekday_kwh * 22) + (weekend_kwh * 8), 2)
+    monthly_kwh = round((demand_weekday * 22) + (demand_weekend * 8), 2)
     monthly_diesel_cost = round(diesel_cost_ngn * 22, 2)
        
     season = "Dry Season (Harmattan)" if nigerian_dry_season else "Rainy Season"
