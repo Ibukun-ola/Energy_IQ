@@ -340,15 +340,17 @@ if predict_btn:
 
  # Generator hours
     operating_hrs = OPERATING_HOURS.get(building_type, 8)
-    deficit = max(0, operating_hrs - effective_grid_hours)
-    generator_hours = min(operating_hrs, deficit + 1.0)
 
     # Grid supply (adjusted for overlap efficiency)
-    overlap_efficiency = 0.6
+    overlap_efficiency = ZONES[zone]['overlap']
     effective_grid_hours = grid_hours * overlap_efficiency
     grid_supply_kwh = total_demand_kwh * (min(effective_grid_hours, operating_hrs / operating_hrs))
     diesel_demand_kwh = max(0, total_demand_kwh - grid_supply_kwh)
     grid_coverage_pct = (grid_supply_kwh / total_demand_kwh * 100) if total_demand_kwh > 0 else 0
+
+ # Deficit hours
+    deficit = max(0, operating_hrs - effective_grid_hours)
+    generator_hours = min(operating_hrs, deficit + 1.0)
 
     # Diesel cost
     litres_per_hour = max(0.5, square_feet * 0.0015)
