@@ -235,37 +235,43 @@ ZONES = {
         'states': 'Lagos, Ogun, Oyo, Osun, Ondo, Ekiti',
         'temp': 30.5, 'wind': 3.2, 'pressure': 1010.5,
         'grid_min': 8, 'grid_max': 10,
-        'hint': '~8–10 hrs/day'
+        'hint': '~8–10 hrs/day',
+        'overlap': 0.45
     },
     'South South': {
         'states': 'Rivers, Delta, Edo, Cross River, Akwa Ibom, Bayelsa',
         'temp': 31.0, 'wind': 2.8, 'pressure': 1009.0,
         'grid_min': 3, 'grid_max': 6,
-        'hint': '~3–6 hrs/day'
+        'hint': '~3–6 hrs/day',
+        'overlap': 0.25
     },
     'South East': {
         'states': 'Enugu, Anambra, Imo, Abia, Ebonyi',
         'temp': 29.5, 'wind': 2.5, 'pressure': 1010.0,
         'grid_min': 9, 'grid_max': 10,
-        'hint': '~9–10 hrs/day'
+        'hint': '~9–10 hrs/day',
+        'overlap': 0.45
     },
     'North West': {
         'states': 'Kano, Kaduna, Katsina, Zamfara, Kebbi, Sokoto, Jigawa',
         'temp': 33.0, 'wind': 4.5, 'pressure': 950.0,
         'grid_min': 7, 'grid_max': 8,
-        'hint': '~7–8 hrs/day'
+        'hint': '~7–8 hrs/day',
+        'overlap': 0.35
     },
     'North East': {
         'states': 'Borno, Yobe, Adamawa, Gombe, Bauchi, Taraba',
         'temp': 34.0, 'wind': 5.0, 'pressure': 945.0,
         'grid_min': 3, 'grid_max': 5,
-        'hint': '~3–5 hrs/day'
+        'hint': '~3–5 hrs/day',
+        'overlap': 0.25
     },
     'North Central': {
         'states': 'FCT Abuja, Niger, Kwara, Kogi, Benue, Plateau, Nasarawa',
         'temp': 29.0, 'wind': 2.8, 'pressure': 912.0,
         'grid_min': 7, 'grid_max': 11,
-        'hint': '~7–11 hrs/day'
+        'hint': '~7–11 hrs/day',
+        'overlap': 0.50
     }
 }
 
@@ -332,17 +338,17 @@ if predict_btn:
     log_pred = model.predict(features)[0]
     total_demand_kwh = float(np.expm1(log_pred))
 
-    # Grid supply (adjusted for overlap efficiency)
-    overlap_efficiency = 0.6
-    effective_grid_hours = grid_hours * overlap_efficiency
-    grid_supply_kwh = total_demand_kwh * (effective_grid_hours / 24)
-    diesel_demand_kwh = max(0, total_demand_kwh - grid_supply_kwh)
-    grid_coverage_pct = (grid_supply_kwh / total_demand_kwh * 100) if total_demand_kwh > 0 else 0
-
-    # Generator hours
+ # Generator hours
     operating_hrs = OPERATING_HOURS.get(building_type, 8)
     deficit = max(0, operating_hrs - effective_grid_hours)
     generator_hours = min(operating_hrs, deficit + 1.0)
+
+    # Grid supply (adjusted for overlap efficiency)
+    overlap_efficiency = 0.6
+    effective_grid_hours = grid_hours * overlap_efficiency
+    grid_supply_kwh = total_demand_kwh * (min(effective_grid_hours, operating_hrs / operating_hrs))
+    diesel_demand_kwh = max(0, total_demand_kwh - grid_supply_kwh)
+    grid_coverage_pct = (grid_supply_kwh / total_demand_kwh * 100) if total_demand_kwh > 0 else 0
 
     # Diesel cost
     litres_per_hour = max(0.5, square_feet * 0.0015)
