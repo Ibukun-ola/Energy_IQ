@@ -339,20 +339,20 @@ if predict_btn:
     total_demand_kwh = float(np.expm1(log_pred))
 
 # ─── Weekday prediction for monthly calculation ──────────────────────────────────────────────────────────
-features_weekday = np.array([[
-    hour, month, 0, 1, nigerian_dry_season,
-    square_feet, floor_count, building_age, primary_use_encoded,
-    air_temperature, wind_speed, sea_level_pressure
-]])
-demand_weekday = float(np.expm1(model.predict(features_weekday)[0]))
+    features_weekday = np.array([[
+        hour, month, 0, 1, nigerian_dry_season,
+        square_feet, floor_count, building_age, primary_use_encoded,
+        air_temperature, wind_speed, sea_level_pressure
+    ]])
+    demand_weekday = float(np.expm1(model.predict(features_weekday)[0]))
 
 # ─── Weekend prediction for monthly calculation ──────────────────────────────────────────────────────────
-features_weekend = np.array([[
-    hour, month, 1, 0, nigerian_dry_season,
-    square_feet, floor_count, building_age, primary_use_encoded,
-    air_temperature, wind_speed, sea_level_pressure
-]])
-demand_weekend = float(np.expm1(model.predict(features_weekend)[0]))
+    features_weekend = np.array([[
+        hour, month, 1, 0, nigerian_dry_season,
+        square_feet, floor_count, building_age, primary_use_encoded,
+        air_temperature, wind_speed, sea_level_pressure
+    ]])
+    demand_weekend = float(np.expm1(model.predict(features_weekend)[0]))
 
     # ─── Generator hours ──────────────────────────────────────────────────────────
     operating_hrs = OPERATING_HOURS.get(building_type, 8)
