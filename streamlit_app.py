@@ -284,6 +284,29 @@ with st.sidebar:
 
     building_type = st.selectbox("Building Type", list(BUILDING_TYPES.keys()), index=6)
     square_feet = st.number_input("Floor Area (sq ft)", min_value=100, max_value=500000, value=5000, step=500)
+
+    square_feet = st.number_input("Floor Area (sq ft)", min_value=100, max_value=500000, value=5000, step=500)
+
+    floor_area_hints = {
+        'Office': '2,000 – 50,000 sqft',
+        'Healthcare': '10,000 – 100,000+ sqft',
+        'Education': '5,000 – 80,000 sqft',
+        'Entertainment/public assembly': '5,000 – 100,000 sqft',
+        'Food sales and service': '1,000 – 20,000 sqft',
+        'Lodging/residential': '5,000 – 80,000 sqft',
+        'Manufacturing/industrial': '10,000 – 200,000+ sqft',
+        'Other': '1,000 – 50,000 sqft',
+        'Parking': '20,000 – 200,000 sqft',
+        'Public services': '2,000 – 30,000 sqft',
+        'Religious worship': '2,000 – 30,000 sqft',
+        'Retail': '1,000 – 50,000 sqft',
+        'Services': '500 – 20,000 sqft',
+        'Technology/science': '5,000 – 100,000 sqft',
+        'Utility': '1,000 – 50,000 sqft',
+        'Warehouse/storage': '10,000 – 500,000 sqft',
+    }
+    st.caption(f"Typical for {building_type}: {floor_area_hints.get(building_type, '1,000 – 50,000 sqft')}")
+
     floor_count = st.number_input("Number of Floors", min_value=1, max_value=50, value=3)
     year_built = st.number_input("Year Built", min_value=1950, max_value=2024, value=2005)
     building_age = 2024 - year_built
