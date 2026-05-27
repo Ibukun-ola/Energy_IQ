@@ -362,7 +362,7 @@ if predict_btn:
     # ─── Grid supply (adjusted for overlap efficiency) ──────────────────────────────────────────────────────────
     overlap_efficiency = ZONES[zone]['overlap']
     effective_grid_hours = grid_hours * overlap_efficiency
-    grid_supply_kwh = total_demand_kwh * (effective_grid_hours / 24.0)
+    grid_supply_kwh = total_demand_kwh * (min(effective_grid_hours, 24.0) / 24.0)
     diesel_demand_kwh = max(0, total_demand_kwh - grid_supply_kwh)
     grid_coverage_pct = (grid_supply_kwh / total_demand_kwh * 100) if total_demand_kwh > 0 else 0
 
