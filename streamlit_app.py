@@ -275,6 +275,8 @@ ZONES = {
     }
 }
 
+DIESEL_PRICE_PER_LITER = 1200.0
+
 # ─── Sidebar Inputs ────────────────────────────────────────────────────────────
 with st.sidebar:
     st.markdown('<div class="hero-title" style="font-size:28px">Energy<span>IQ</span></div>', unsafe_allow_html=True)
@@ -360,7 +362,7 @@ if predict_btn:
     # ─── Grid supply (adjusted for overlap efficiency) ──────────────────────────────────────────────────────────
     overlap_efficiency = ZONES[zone]['overlap']
     effective_grid_hours = grid_hours * overlap_efficiency
-    grid_supply_kwh = total_demand_kwh * (min(effective_grid_hours, operating_hrs) / operating_hrs)
+    grid_supply_kwh = total_demand_kwh * (effective_grid_hours / 24.0)
     diesel_demand_kwh = max(0, total_demand_kwh - grid_supply_kwh)
     grid_coverage_pct = (grid_supply_kwh / total_demand_kwh * 100) if total_demand_kwh > 0 else 0
 
@@ -371,7 +373,7 @@ if predict_btn:
     # ─── Diesel cost ──────────────────────────────────────────────────────────
     litres_per_hour = max(0.5, square_feet * 0.0015)
     diesel_litres = round(generator_hours * litres_per_hour, 2)
-    diesel_cost_ngn = round(diesel_litres * 1200, 2)
+    diesel_cost_ngn = round(diesel_litres * DIESEL_PRICE_PER_LITER, 2)
 
     # ─── Monthly ──────────────────────────────────────────────────────────
     weekday_kwh = total_demand_kwh
