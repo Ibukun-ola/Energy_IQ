@@ -362,13 +362,13 @@ if predict_btn:
     # ─── Grid supply (adjusted for overlap efficiency) ──────────────────────────────────────────────────────────
     overlap_efficiency = ZONES[zone]['overlap']
     effective_grid_hours = grid_hours * overlap_efficiency
-    grid_supply_kwh = total_demand_kwh * (min(effective_grid_hours, 24.0) / 24.0)
+    grid_supply_kwh = total_demand_kwh * (effective_grid_hours / 24)
     diesel_demand_kwh = max(0, total_demand_kwh - grid_supply_kwh)
     grid_coverage_pct = (grid_supply_kwh / total_demand_kwh * 100) if total_demand_kwh > 0 else 0
 
     # ─── Deficit hours ──────────────────────────────────────────────────────────
-    deficit = max(0, operating_hrs - effective_grid_hours)
-    generator_hours = min(operating_hrs, deficit + 1.0)
+    deficit = max(0, 24 - effective_grid_hours)
+    generator_hours = round(min(24, deficit + 1.0), 1)
 
     # ─── Diesel cost ──────────────────────────────────────────────────────────
     litres_per_hour = max(0.5, square_feet * 0.0015)
@@ -412,6 +412,16 @@ if predict_btn:
             <div class="metric-sub">kWh / day must come from generator</div>
         </div>
         """, unsafe_allow_html=True)
+
+    st.divider()
+    st.subheader("What does this mean?")
+
+    if total_demand_kwh < 30:
+        st.info("💡 **Low Consumption:** Equivalent to a small office or shop. Primarily lighting, fans, and basic IT equipment.")
+    elif total_demand_kwh < 100:
+        st.warning("🏢 **Moderate Consumption:** Typical for a medium office. Includes essential cooling (AC) and office infrastructure.")
+    else:
+        st.error("⚡ **High Consumption:** Suggests heavy industrial use, large-scale HVAC, or significant machinery.")
 
     st.markdown('<div class="divider"></div>', unsafe_allow_html=True)
 
